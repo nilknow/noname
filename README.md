@@ -11,10 +11,14 @@ Then run the main.cpp file.
 * OpenGL(GLFW+glad)
 * cmake
 
+## documentation
+
+
 ## to do
 * draw triangle by OpenGL
 
 ## reference
 * learnopengl.com
+* ![relationship between VAO,VBO and EBO](documentation/img/img.png)
 
 ## notes
