@@ -10,20 +10,19 @@
 
 const char *vertexShaderSource = "#version 460 core\n"
                                  "layout (location = 0) in vec3 pos;\n"
-                                 "out vec4 vertexColor;\n"
+                                 "layout (location = 1) in vec3 inColor;\n"
+                                 "out vec3 color;\n"
                                  "void main()\n"
                                  "{\n"
                                  "    gl_Position=vec4(pos.x,pos.y,pos.z,1.0);\n"
-                                 "    vertexColor=vec4(0.5,0.0,0.0,1.0);\n"
+                                 "    color=inColor;\n"
                                  "}\0";
 const char *fragmentShaderSource = "#version 460 core\n"
-                                   "in vec4 vertexColor;\n"
-                                   "uniform vec4 globalColor;\n"
+                                   "in vec3 color;\n"
                                    "out vec4 FragColor;\n"
                                    "void main()\n"
                                    "{\n"
-                                   "    FragColor=globalColor;\n"
-//                                   "    FragColor=vertexColor;\n"
+                                   "    FragColor=vec4(color,1.0);\n"
                                    "}\n";
 
 void framebuffer_size_callback(GLFWwindow *pWindow, int width, int height);
@@ -97,31 +96,27 @@ int main() {
 
     //indexed drawing
     float vertices[] = {
-            0.5f, 0.5f, 0.0f,  // top right
-            0.5f, -0.5f, 0.0f,  // bottom right
-            -0.5f, -0.5f, 0.0f,  // bottom left
-            -0.5f, 0.5f, 0.0f   // top left
-    };
-    unsigned int indices[] = {  // note that we start from 0!
-            0, 1, 3,   // first triangle
-            1, 2, 3    // second triangle
+            // positions         // colors
+            0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,   // bottom right
+            -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,   // bottom left
+            0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f    // top
     };
 
     unsigned int vertexArray;
     glGenVertexArrays(1, &vertexArray);
     //bind the vertex array object first, then set vertex buffer and config vertex attribute
     glBindVertexArray(vertexArray);
+
     unsigned int vertexBuffer;
     glGenBuffers(1, &vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    unsigned int elementBuffer;
-    glGenBuffers(1, &elementBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
     //tell gl how interpret vertex data
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) 0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) (3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     //get maximum of vertex attribute count
 //    int vertexAttributeMaxCount;
@@ -136,23 +131,15 @@ int main() {
         render();
 
         //draw
-        glUseProgram(shaderProgram);//use program before update uniform
-        //change color by time
-        float time = glfwGetTime();
-        float greenValue=(sin(time)/2.0f)+0.5f;
-        int vertexColorLocation = glGetUniformLocation(shaderProgram, "globalColor");
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-//        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-//        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glUseProgram(shaderProgram);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
         //double buffer
         glfwSwapBuffers(pWindow);
         glfwPollEvents();
     }
 
-//    glDeleteVertexArrays(1, &vertexArray);
-//    glDeleteBuffers(1, &vertexBuffer);
-    glDeleteBuffers(1, &elementBuffer);
+    glDeleteVertexArrays(1, &vertexArray);
+    glDeleteBuffers(1, &vertexBuffer);
     glDeleteProgram(shaderProgram);
 
     glfwTerminate();
