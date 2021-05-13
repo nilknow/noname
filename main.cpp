@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 #include <iostream>
+#include <valarray>
 
 #define WIN_WIDTH 800
 #define WIN_HEIGHT 600
@@ -17,10 +18,12 @@ const char *vertexShaderSource = "#version 460 core\n"
                                  "}\0";
 const char *fragmentShaderSource = "#version 460 core\n"
                                    "in vec4 vertexColor;\n"
+                                   "uniform vec4 globalColor;\n"
                                    "out vec4 FragColor;\n"
                                    "void main()\n"
                                    "{\n"
-                                   "    FragColor=vertexColor;\n"
+                                   "    FragColor=globalColor;\n"
+//                                   "    FragColor=vertexColor;\n"
                                    "}\n";
 
 void framebuffer_size_callback(GLFWwindow *pWindow, int width, int height);
@@ -133,7 +136,12 @@ int main() {
         render();
 
         //draw
-        glUseProgram(shaderProgram);
+        glUseProgram(shaderProgram);//use program before update uniform
+        //change color by time
+        float time = glfwGetTime();
+        float greenValue=(sin(time)/2.0f)+0.5f;
+        int vertexColorLocation = glGetUniformLocation(shaderProgram, "globalColor");
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 //        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 //        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
