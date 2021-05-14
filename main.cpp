@@ -1,29 +1,13 @@
 #define GLFW_INCLUDE_NONE
-
-#include <GLFW/glfw3.h>
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <iostream>
 #include <valarray>
 
+#include "shader.hpp"
+
 #define WIN_WIDTH 800
 #define WIN_HEIGHT 600
-
-const char *vertexShaderSource = "#version 460 core\n"
-                                 "layout (location = 0) in vec3 pos;\n"
-                                 "layout (location = 1) in vec3 inColor;\n"
-                                 "out vec3 color;\n"
-                                 "void main()\n"
-                                 "{\n"
-                                 "    gl_Position=vec4(pos.x,pos.y,pos.z,1.0);\n"
-                                 "    color=inColor;\n"
-                                 "}\0";
-const char *fragmentShaderSource = "#version 460 core\n"
-                                   "in vec3 color;\n"
-                                   "out vec4 FragColor;\n"
-                                   "void main()\n"
-                                   "{\n"
-                                   "    FragColor=vec4(color,1.0);\n"
-                                   "}\n";
 
 void framebuffer_size_callback(GLFWwindow *pWindow, int width, int height);
 
@@ -61,38 +45,8 @@ int main() {
     }
 
     //shader setting
-    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-    int success;
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    char infoLog[512];
-    if (!success) {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-    //link shader program
-    unsigned int shaderProgram;
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER_PROGRAM::LINK_FAILED\n" << infoLog << std::endl;
-    }
-    //we don't need shader which have been linked to shaderProgram object,过河拆桥:P
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    Shader shader = Shader("./shader/src/vertexShader.vs",
+                           "./shader/src/fragmentShader.fs");
 
     //indexed drawing
     float vertices[] = {
@@ -118,11 +72,6 @@ int main() {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    //get maximum of vertex attribute count
-//    int vertexAttributeMaxCount;
-//    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &vertexAttributeMaxCount);
-//    std::cout << "Maximum of vertex attribute count is: " << vertexAttributeMaxCount << std::endl;
-
     //render loop
     while (!glfwWindowShouldClose(pWindow)) {
         keyInputCheck(pWindow);
@@ -131,7 +80,7 @@ int main() {
         render();
 
         //draw
-        glUseProgram(shaderProgram);
+        shader.use();
         glDrawArrays(GL_TRIANGLES, 0, 3);
         //double buffer
         glfwSwapBuffers(pWindow);
@@ -140,7 +89,7 @@ int main() {
 
     glDeleteVertexArrays(1, &vertexArray);
     glDeleteBuffers(1, &vertexBuffer);
-    glDeleteProgram(shaderProgram);
+    shader.deleteProgram();
 
     glfwTerminate();
     return 0;
