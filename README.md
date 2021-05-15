@@ -2,8 +2,10 @@
 A game inspired by minecraft developed with OpenGL. I haven't come up with the name of this game.
 
 ## build
-Choose and download correspond version of GLFW and glad library. build it and config like I did.
-Then run the main.cpp file.
+Download and build correspond version of GLFW and glad library. Use cmake to build and run.
+
+If you use Clion, don't forget to set working directory to the project's root directory, in case the relative path in 
+this project prefix with `./build/`
 
 ## tools
 * Manjaro (Linux distro)

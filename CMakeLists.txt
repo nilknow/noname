@@ -12,6 +12,6 @@ set(SOURCE
 
 add_executable(noname main.cpp ${SOURCE})
 #target_sources(noname PRIVATE glad.c shader.cpp)
-link_directories(${CMAKE_SOURCE_DIR}/lib)
 target_include_directories(noname PRIVATE ${CMAKE_SOURCE_DIR}/include)
+link_directories(${CMAKE_SOURCE_DIR}/lib)
 target_link_libraries(noname GL pthread Xrandr Xi dl X11 glfw)
