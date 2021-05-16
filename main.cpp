@@ -5,6 +5,7 @@
 #include <valarray>
 
 #include "shader.hpp"
+#include "stb_image.h"
 
 #define WIN_WIDTH 800
 #define WIN_HEIGHT 600
@@ -50,11 +51,29 @@ int main() {
 
     //indexed drawing
     float vertices[] = {
-            // positions         // colors
-            0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,   // bottom right
-            -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,   // bottom left
-            0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f    // top
+            // positions          // colors           // texture coords
+            0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+            0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+            -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+            -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
     };
+    float indexes[]={
+            0,1,2,
+            1,2,3
+    };
+    //init texture
+    int imgWidth,imgHeight,nrChannels; //nrChannels: number of color channels
+    unsigned char *imgData = stbi_load("./img/wooden_container.png", &imgWidth, &imgHeight, &nrChannels, 0);
+    if (!imgData) {
+        std::cout << "Failed to load texture" << std::endl;
+        exit(1);
+    }
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgHeight, imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, imgData);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(imgData);
 
     unsigned int vertexArray;
     glGenVertexArrays(1, &vertexArray);
@@ -66,11 +85,13 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    //tell gl how interpret vertex data
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) 0);
+    //tell gl how interpret vertex imgData
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) 0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) (3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     //render loop
     while (!glfwWindowShouldClose(pWindow)) {
@@ -93,10 +114,6 @@ int main() {
 
     glfwTerminate();
     return 0;
-}
-
-void cacheData() {
-
 }
 
 void render() {
