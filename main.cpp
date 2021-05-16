@@ -74,6 +74,8 @@ int main() {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgHeight, imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, imgData);
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(imgData);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
 
     unsigned int vertexArray;
     glGenVertexArrays(1, &vertexArray);
