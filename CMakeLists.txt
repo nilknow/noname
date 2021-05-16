@@ -15,5 +15,6 @@ add_executable(noname main.cpp ${SOURCE})
 target_include_directories(noname PRIVATE ${CMAKE_SOURCE_DIR}/include)
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 
-find_package(glfw3 3.3 REQUIRED PATH ${CMAKE_SOURCE_DIR}/lib)
+#find_package(glfw3 3.3 REQUIRED PATH ${CMAKE_SOURCE_DIR}/lib)
+add_subdirectory(${CMAKE_SOURCE_DIR}/glfw)
 target_link_libraries(noname GL pthread Xrandr Xi dl X11 glfw)
