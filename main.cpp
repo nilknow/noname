@@ -62,14 +62,14 @@ int main() {
             1,2,3
     };
     //init texture
-    int imgWidth,imgHeight,nrChannels,imgWidth2,imgHeight2,nrChannels2; //nrChannels: number of color channels
+    int imgWidth, imgHeight, nrChannels, imgWidth2, imgHeight2, nrChannels2; //nrChannels: number of color channels
+    stbi_set_flip_vertically_on_load(true);
     unsigned char *imgData = stbi_load("./img/wooden_container.png", &imgWidth, &imgHeight, &nrChannels, 0);
     unsigned char *imgData2 = stbi_load("./img/awesomeface.png", &imgWidth2, &imgHeight2, &nrChannels2, 0);
     if (!imgData||!imgData2) {
         std::cout << "Failed to load texture" << std::endl;
         exit(1);
     }
-    stbi_set_flip_vertically_on_load(true);
     unsigned int texture,texture2;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
