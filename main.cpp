@@ -62,20 +62,29 @@ int main() {
             1,2,3
     };
     //init texture
-    int imgWidth,imgHeight,nrChannels; //nrChannels: number of color channels
+    int imgWidth,imgHeight,nrChannels,imgWidth2,imgHeight2,nrChannels2; //nrChannels: number of color channels
     unsigned char *imgData = stbi_load("./img/wooden_container.png", &imgWidth, &imgHeight, &nrChannels, 0);
-    if (!imgData) {
+    unsigned char *imgData2 = stbi_load("./img/awesomeface.png", &imgWidth2, &imgHeight2, &nrChannels2, 0);
+    if (!imgData||!imgData2) {
         std::cout << "Failed to load texture" << std::endl;
         exit(1);
     }
-    unsigned int texture;
+    unsigned int texture,texture2;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgHeight, imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, imgData);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgWidth, imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, imgData);
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(imgData);
+    glGenTextures(1, &texture2);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgWidth2, imgHeight2, 0, GL_RGBA, GL_UNSIGNED_BYTE, imgData2);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    stbi_image_free(imgData2);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D,texture2);
+
 
     unsigned int vertexArray;
     glGenVertexArrays(1, &vertexArray);
@@ -95,15 +104,15 @@ int main() {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
+    shader.use();
+    shader.setInt("sampler1", 0);
+    shader.setInt("sampler2", 1);
     //render loop
     while (!glfwWindowShouldClose(pWindow)) {
         keyInputCheck(pWindow);
-
         //rendering
         render();
-
         //draw
-        shader.use();
         glDrawArrays(GL_TRIANGLES, 0, 3);
         //double buffer
         glfwSwapBuffers(pWindow);
