@@ -19,9 +19,14 @@ void keyInputCheck(GLFWwindow *pWindow);
 
 void render();
 
+void error_callback(int error,const char* description){
+    fprintf(stderr, "Error: %s\n", description);
+}
+
 int main() {
     //glfw initiation
     glfwInit();
+    glfwSetErrorCallback(error_callback);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -51,7 +56,13 @@ int main() {
     //shader setting
     Shader shader = Shader("./shader/src/vertexShader.vs",
                            "./shader/src/fragmentShader.fs");
-
+    //shader transform
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 0.1));
+    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+    shader.use();
+    int transformLoc = glGetUniformLocation(shader.programId, "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
     //indexed drawing
     float vertices[] = {
             // positions          // colors           // texture coords
@@ -88,7 +99,9 @@ int main() {
     glBindTexture(GL_TEXTURE_2D, texture);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D,texture2);
-
+    shader.use();
+    shader.setInt("sampler1", 0);
+    shader.setInt("sampler2", 1);
 
     unsigned int vertexArray;
     glGenVertexArrays(1, &vertexArray);
@@ -108,9 +121,6 @@ int main() {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
-    shader.use();
-    shader.setInt("sampler1", 0);
-    shader.setInt("sampler2", 1);
     //render loop
     while (!glfwWindowShouldClose(pWindow)) {
         keyInputCheck(pWindow);
