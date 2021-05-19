@@ -1,14 +1,17 @@
 #define GLFW_INCLUDE_NONE
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <valarray>
 
-#include "shader.hpp"
+#include "shader/src/shader.hpp"
 #include "stb_image.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "Console.hpp"
+#include "component/Fps.hpp"
 
 #define WIN_WIDTH 800
 #define WIN_HEIGHT 600
@@ -19,30 +22,45 @@ void keyInputCheck(GLFWwindow *pWindow);
 
 void render();
 
-void error_callback(int error,const char* description){
+void error_callback(int error, const char *description) {
     fprintf(stderr, "Error: %s\n", description);
 }
 
-GLenum glCheckError_(const char *file, int line)
-{
+GLenum glCheckError_(const char *file, int line) {
     GLenum errorCode;
-    while ((errorCode = glGetError()) != GL_NO_ERROR)
-    {
+    while ((errorCode = glGetError()) != GL_NO_ERROR) {
         std::string error;
-        switch (errorCode)
-        {
-            case GL_INVALID_ENUM:                  error = "INVALID_ENUM"; break;
-            case GL_INVALID_VALUE:                 error = "INVALID_VALUE"; break;
-            case GL_INVALID_OPERATION:             error = "INVALID_OPERATION"; break;
-            case GL_STACK_OVERFLOW:                error = "STACK_OVERFLOW"; break;
-            case GL_STACK_UNDERFLOW:               error = "STACK_UNDERFLOW"; break;
-            case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
-            case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
+        switch (errorCode) {
+            case GL_INVALID_ENUM:
+                error = "INVALID_ENUM";
+                break;
+            case GL_INVALID_VALUE:
+                error = "INVALID_VALUE";
+                break;
+            case GL_INVALID_OPERATION:
+                error = "INVALID_OPERATION";
+                break;
+            case GL_STACK_OVERFLOW:
+                error = "STACK_OVERFLOW";
+                break;
+            case GL_STACK_UNDERFLOW:
+                error = "STACK_UNDERFLOW";
+                break;
+            case GL_OUT_OF_MEMORY:
+                error = "OUT_OF_MEMORY";
+                break;
+            case GL_INVALID_FRAMEBUFFER_OPERATION:
+                error = "INVALID_FRAMEBUFFER_OPERATION";
+                break;
+            default:
+                error = "UNDEFINED_ERROR";
+                break;
         }
         std::cout << error << " | " << file << " (" << line << ")" << std::endl;
     }
     return errorCode;
 }
+
 #define glCheckError() glCheckError_(__FILE__, __LINE__)
 
 int main() {
@@ -53,7 +71,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     //for debug
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+//    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
     //good code style, learn it
 #ifdef __APPLE__
@@ -84,14 +102,14 @@ int main() {
     //indexed drawing
     float vertices[] = {
             // positions          // colors           // texture coords
-            0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-            0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-            -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-            -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
+            0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,   // top right
+            0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,   // bottom right
+            -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,   // bottom left
+            -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f    // top left
     };
-    float indices[]={
-            0,1,3,
-            1,2,3
+    float indices[] = {
+            0, 1, 3,
+            1, 2, 3
     };
 
     unsigned int vertexArray;
@@ -103,7 +121,6 @@ int main() {
     glGenBuffers(1, &vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    GLenum errorCode = glGetError();
 
     unsigned int elementBuffer;
     glGenBuffers(1, &elementBuffer);
@@ -117,17 +134,18 @@ int main() {
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
     glEnableVertexAttribArray(2);
+    glCheckError();
 
     //init texture
     int imgWidth, imgHeight, nrChannels, imgWidth2, imgHeight2, nrChannels2; //nrChannels: number of color channels
     stbi_set_flip_vertically_on_load(true);
     unsigned char *imgData = stbi_load("./img/wooden_container.png", &imgWidth, &imgHeight, &nrChannels, 0);
     unsigned char *imgData2 = stbi_load("./img/awesome_face.png", &imgWidth2, &imgHeight2, &nrChannels2, 0);
-    if (!imgData||!imgData2) {
+    if (!imgData || !imgData2) {
         std::cout << "Failed to load texture" << std::endl;
         exit(1);
     }
-    unsigned int texture,texture2;
+    unsigned int texture, texture2;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgWidth, imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, imgData);
@@ -141,12 +159,14 @@ int main() {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D,texture2);
+    glBindTexture(GL_TEXTURE_2D, texture2);
     shader.use();
     shader.setInt("sampler1", 0);
     shader.setInt("sampler2", 1);
     glCheckError();
 
+    Console console = Console("");
+    Fps fps = Fps();
     //render loop
     while (!glfwWindowShouldClose(pWindow)) {
         keyInputCheck(pWindow);
@@ -155,7 +175,7 @@ int main() {
         //draw
         //shader transform
         glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::rotate(trans, -(float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
+        trans = glm::rotate(trans, -(float) glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
         trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
         shader.use();
         int transformLoc = glGetUniformLocation(shader.programId, "transform");
@@ -163,6 +183,8 @@ int main() {
         glBindVertexArray(vertexArray);
         glDrawElements(elementBuffer, 6, GL_UNSIGNED_INT, 0);
 
+        double fpsVal = fps.refresh();
+        console.setContent(std::to_string(fpsVal));
         //double buffer
         glfwSwapBuffers(pWindow);
         glfwPollEvents();

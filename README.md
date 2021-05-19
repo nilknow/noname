@@ -16,12 +16,9 @@ this project prefix with `./build/`
 
 ## documentation
 
-
-## to do
-* draw triangle by OpenGL
-
 ## reference
 * learnopengl.com
 * ![relationship between VAO,VBO and EBO](documentation/img/img.png)
 
 ## notes
+* ways to debug in opengl: gl
