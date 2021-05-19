@@ -23,6 +23,28 @@ void error_callback(int error,const char* description){
     fprintf(stderr, "Error: %s\n", description);
 }
 
+GLenum glCheckError_(const char *file, int line)
+{
+    GLenum errorCode;
+    while ((errorCode = glGetError()) != GL_NO_ERROR)
+    {
+        std::string error;
+        switch (errorCode)
+        {
+            case GL_INVALID_ENUM:                  error = "INVALID_ENUM"; break;
+            case GL_INVALID_VALUE:                 error = "INVALID_VALUE"; break;
+            case GL_INVALID_OPERATION:             error = "INVALID_OPERATION"; break;
+            case GL_STACK_OVERFLOW:                error = "STACK_OVERFLOW"; break;
+            case GL_STACK_UNDERFLOW:               error = "STACK_UNDERFLOW"; break;
+            case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
+            case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
+        }
+        std::cout << error << " | " << file << " (" << line << ")" << std::endl;
+    }
+    return errorCode;
+}
+#define glCheckError() glCheckError_(__FILE__, __LINE__)
+
 int main() {
     //glfw initiation
     glfwInit();
@@ -30,6 +52,8 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    //for debug
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
     //good code style, learn it
 #ifdef __APPLE__
@@ -56,13 +80,7 @@ int main() {
     //shader setting
     Shader shader = Shader("./shader/src/vertexShader.vs",
                            "./shader/src/fragmentShader.fs");
-    //shader transform
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 0.1));
-    trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
-    shader.use();
-    int transformLoc = glGetUniformLocation(shader.programId, "transform");
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
     //indexed drawing
     float vertices[] = {
             // positions          // colors           // texture coords
@@ -71,15 +89,40 @@ int main() {
             -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
             -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
     };
-    float indexes[]={
-            0,1,2,
+    float indices[]={
+            0,1,3,
             1,2,3
     };
+
+    unsigned int vertexArray;
+    glGenVertexArrays(1, &vertexArray);
+    //bind the vertex array object first, then set vertex buffer and config vertex attribute
+    glBindVertexArray(vertexArray);
+
+    unsigned int vertexBuffer;
+    glGenBuffers(1, &vertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    GLenum errorCode = glGetError();
+
+    unsigned int elementBuffer;
+    glGenBuffers(1, &elementBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    //tell gl how interpret vertex imgData
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) 0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
     //init texture
     int imgWidth, imgHeight, nrChannels, imgWidth2, imgHeight2, nrChannels2; //nrChannels: number of color channels
     stbi_set_flip_vertically_on_load(true);
     unsigned char *imgData = stbi_load("./img/wooden_container.png", &imgWidth, &imgHeight, &nrChannels, 0);
-    unsigned char *imgData2 = stbi_load("./img/awesomeface.png", &imgWidth2, &imgHeight2, &nrChannels2, 0);
+    unsigned char *imgData2 = stbi_load("./img/awesome_face.png", &imgWidth2, &imgHeight2, &nrChannels2, 0);
     if (!imgData||!imgData2) {
         std::cout << "Failed to load texture" << std::endl;
         exit(1);
@@ -102,24 +145,7 @@ int main() {
     shader.use();
     shader.setInt("sampler1", 0);
     shader.setInt("sampler2", 1);
-
-    unsigned int vertexArray;
-    glGenVertexArrays(1, &vertexArray);
-    //bind the vertex array object first, then set vertex buffer and config vertex attribute
-    glBindVertexArray(vertexArray);
-
-    unsigned int vertexBuffer;
-    glGenBuffers(1, &vertexBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    //tell gl how interpret vertex imgData
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) 0);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+    glCheckError();
 
     //render loop
     while (!glfwWindowShouldClose(pWindow)) {
@@ -127,7 +153,16 @@ int main() {
         //rendering
         render();
         //draw
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        //shader transform
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::rotate(trans, -(float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
+        trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+        shader.use();
+        int transformLoc = glGetUniformLocation(shader.programId, "transform");
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+        glBindVertexArray(vertexArray);
+        glDrawElements(elementBuffer, 6, GL_UNSIGNED_INT, 0);
+
         //double buffer
         glfwSwapBuffers(pWindow);
         glfwPollEvents();
@@ -135,6 +170,7 @@ int main() {
 
     glDeleteVertexArrays(1, &vertexArray);
     glDeleteBuffers(1, &vertexBuffer);
+    glDeleteBuffers(1, &elementBuffer);
     shader.deleteProgram();
 
     glfwTerminate();
