@@ -25,7 +25,23 @@ add_executable(${PROJECT_NAME} ${SOURCE})
 
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 #find_package(glfw3 3.3 REQUIRED PATH ${CMAKE_SOURCE_DIR}/lib)
-add_subdirectory(${CMAKE_SOURCE_DIR}/glfw)
+#add_subdirectory(${CMAKE_SOURCE_DIR}/glfw)
 target_link_libraries(noname GL pthread Xrandr Xi dl X11 glfw console)
 
-#install(TARGETS noname)
+# Binaries
+install(TARGETS noname DESTINATION bin)
+
+# Library
+# Note: may not work on windows
+install(TARGETS console
+        LIBRARY DESTINATION lib)
+
+# Header files
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
+        DESTINATION include)
+
+# Config
+install(FILES
+        ${PROJECT_SOURCE_DIR}/shader/src/vertexShader.vs
+        ${PROJECT_SOURCE_DIR}/shader/src/fragmentShader.fs
+        DESTINATION etc)
