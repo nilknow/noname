@@ -11,19 +11,21 @@ set(SOURCE
         stb_image.cpp
         )
 
-add_library(console STATIC Console.cpp)
-target_include_directories(console PUBLIC ${CMAKE_SOURCE_DIR})
-
-add_executable(${PROJECT_NAME}  ${SOURCE})
-#target_sources(noname PRIVATE glad.c shader.cpp)
-target_include_directories(noname PRIVATE
+add_library(console SHARED Console.cpp)
+target_include_directories(console
+        PUBLIC
+        ${CMAKE_SOURCE_DIR}
         ${CMAKE_SOURCE_DIR}/include
         ${CMAKE_SOURCE_DIR}/shader/src
         ${CMAKE_SOURCE_DIR}/component
-        ${CMAKE_SOURCE_DIR}
         )
+
+add_executable(${PROJECT_NAME} ${SOURCE})
+#target_sources(noname PRIVATE glad.c shader.cpp)
 
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 #find_package(glfw3 3.3 REQUIRED PATH ${CMAKE_SOURCE_DIR}/lib)
 add_subdirectory(${CMAKE_SOURCE_DIR}/glfw)
 target_link_libraries(noname GL pthread Xrandr Xi dl X11 glfw console)
+
+#install(TARGETS noname)
