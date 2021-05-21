@@ -17,8 +17,9 @@ this project prefix with `./build/`
 ## documentation
 
 ## reference
-* learnopengl.com
+* [learnopengl.com](https://learnopengl.com/)
 * ![relationship between VAO,VBO and EBO](documentation/img/img.png)
+* [cmake-example](https://github.com/ttroy50/cmake-examples)
 
 ## notes
-* ways to debug in opengl: gl
+* ways to debug in opengl: console, `glGetError()` and some other GUI tools
