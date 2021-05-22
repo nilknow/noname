@@ -78,8 +78,8 @@ int main() {
 #endif
 
     //create window
-    GLFWwindow *pWindow = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "noname", NULL, NULL);
-    if (pWindow == NULL) {
+    GLFWwindow *pWindow = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "noname", nullptr, nullptr);
+    if (pWindow == nullptr) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
@@ -111,26 +111,28 @@ int main() {
             1, 2, 3
     };
 
-    unsigned int vertexArray;
+    unsigned int vertexArray,vertexBuffer,elementBuffer;
     glGenVertexArrays(1, &vertexArray);
+    glGenBuffers(1, &vertexBuffer);
+    glGenBuffers(1, &elementBuffer);
+
     //bind the vertex array object first, then set vertex buffer and config vertex attribute
     glBindVertexArray(vertexArray);
 
-    unsigned int vertexBuffer;
-    glGenBuffers(1, &vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    unsigned int elementBuffer;
-    glGenBuffers(1, &elementBuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     //tell gl how interpret vertex imgData
+    //position
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) 0);
     glEnableVertexAttribArray(0);
+    //color
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    //texture
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *) (6 * sizeof(float)));
     glEnableVertexAttribArray(2);
     glCheckError();
@@ -144,22 +146,31 @@ int main() {
         std::cout << "Failed to load texture" << std::endl;
         exit(1);
     }
-    unsigned int texture, texture2;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    unsigned int texture1, texture2;
+    glGenTextures(1, &texture1);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgWidth, imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, imgData);
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(imgData);
     glGenTextures(1, &texture2);
     glBindTexture(GL_TEXTURE_2D, texture2);
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgWidth2, imgHeight2, 0, GL_RGBA, GL_UNSIGNED_BYTE, imgData2);
     glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(imgData2);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, texture2);
     shader.use();
+    //set as uniforms of fragment shader
     shader.setInt("sampler1", 0);
     shader.setInt("sampler2", 1);
     glCheckError();
@@ -171,21 +182,27 @@ int main() {
         //rendering
         render();
         //draw
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture2);
         //shader transform
-        glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::rotate(trans, -(float) glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
-        trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+        glm::mat4 transform = glm::mat4(1.0f);
+        transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
+        transform = glm::rotate(transform, (float) glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+
         shader.use();
         int transformLoc = glGetUniformLocation(shader.programId, "transform");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-        glBindVertexArray(vertexArray);
-        glDrawElements(elementBuffer, 6, GL_UNSIGNED_INT, 0);
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
 
-        std::string content = fps.refresh();
-        fps.show(&content);
+        glBindVertexArray(vertexArray);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
         //double buffer
         glfwSwapBuffers(pWindow);
         glfwPollEvents();
+        std::string content = fps.refresh();
+        fps.show(&content);
     }
 
     glDeleteVertexArrays(1, &vertexArray);
