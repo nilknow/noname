@@ -11,7 +11,7 @@ set(SOURCE
         stb_image.cpp
         )
 
-add_library(console SHARED Console.cpp)
+add_library(console SHARED ${CMAKE_SOURCE_DIR}/component/Console.cpp)
 target_include_directories(console
         PUBLIC
         ${CMAKE_SOURCE_DIR}
