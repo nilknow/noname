@@ -10,7 +10,6 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "Console.hpp"
 #include "component/Fps.hpp"
 
 #define WIN_WIDTH 800
@@ -165,7 +164,6 @@ int main() {
     shader.setInt("sampler2", 1);
     glCheckError();
 
-    Console console = Console("");
     Fps fps = Fps();
     //render loop
     while (!glfwWindowShouldClose(pWindow)) {
@@ -183,8 +181,8 @@ int main() {
         glBindVertexArray(vertexArray);
         glDrawElements(elementBuffer, 6, GL_UNSIGNED_INT, 0);
 
-        double fpsVal = fps.refresh();
-        console.setContent(std::to_string(fpsVal));
+        std::string content = fps.refresh();
+        fps.show(&content);
         //double buffer
         glfwSwapBuffers(pWindow);
         glfwPollEvents();

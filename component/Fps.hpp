@@ -3,10 +3,16 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <utility>
+
+#include "Console.hpp"
+
 class Fps{
 private:
     double lastTime = glfwGetTime();
-public: double refresh();
+public:
+    std::string refresh();
+    void show(std::string* content);
 };
 
 #endif
