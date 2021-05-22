@@ -23,3 +23,9 @@ this project prefix with `./build/`
 
 ## notes
 * ways to debug in opengl: console, `glGetError()` and some other GUI tools
+* cmake: 
+    1. headers: `target_include_directories()`
+    2. static/shared library: `add_library()` with `STATIC` or `SHARED` param
+    3. install: create `make install` rule with cmake. use `install` function in cmake
+    4. build type: can set compile level by build type. It can also let cmake compile it in debug mode.
+    5. compile flag: `target_compile_definitions()` or `CMAKE_CXX_FLAGS`. They will not override.
