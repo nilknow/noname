@@ -7,7 +7,7 @@ Console::Console() {
 }
 
 void Console::showOutput() {
-    std::cout << _content << std::endl;
+    std::cout << *_content << std::endl;
 }
 void Console::loadFont() {
 //    FT_Library ft;
