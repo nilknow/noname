@@ -24,7 +24,14 @@ add_executable(${PROJECT_NAME} ${SOURCE})
 #target_sources(noname PRIVATE glad.c shader.cpp)
 
 link_directories(${CMAKE_SOURCE_DIR}/lib)
-#find_package(glfw3 3.3 REQUIRED PATH ${CMAKE_SOURCE_DIR}/lib)
+find_package(glfw3 3.3 REQUIRED COMPONENTS filesystem system)
+# check if glfw3 was found
+if(glfw3_FOUND)
+    message ("glfw3 found")
+else()
+    message (FATAL_ERROR "Cannot find glfw3")
+    add_subdirectory(${CMAKE_SOURCE_DIR}/glfw)
+endif()
 #add_subdirectory(${CMAKE_SOURCE_DIR}/glfw)
 target_link_libraries(noname GL pthread Xrandr Xi dl X11 glfw console)
 
