@@ -1,6 +1,6 @@
 #include "Console.hpp"
 
-Console *Console::_instance;
+Console* Console::_instance;
 
 Console::Console() {
     loadFont();
@@ -10,6 +10,7 @@ void Console::showOutput() {
     std::cout << *_content << std::endl;
 }
 void Console::loadFont() {
+    //todo will show console in OpenGL window in a few days later
 //    FT_Library ft;
 //    if (FT_Init_FreeType(&ft)) {
 //        std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
