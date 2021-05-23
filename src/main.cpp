@@ -4,10 +4,11 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <valarray>
+#include <stb_image/stb_image.h>
+#include <glm/glm.hpp>
 
-#include "src/component/shader.hpp"
-#include "thirdparty/stb_image/stb_image.h"
-#include "glm/glm.hpp"
+#include "component/shader.hpp"
+#include "util/GlUtil.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "component/Fps.hpp"
@@ -23,54 +24,8 @@ void render();
 
 void showBoundVertexArray();
 
-void error_callback(int error, const char *description) {
-    fprintf(stderr, "Error: %s\n", description);
-}
-
-GLenum glCheckError_(const char *file, int line) {
-    GLenum errorCode;
-    while ((errorCode = glGetError()) != GL_NO_ERROR) {
-        std::string error;
-        switch (errorCode) {
-            case GL_INVALID_ENUM:
-                error = "INVALID_ENUM";
-                break;
-            case GL_INVALID_VALUE:
-                error = "INVALID_VALUE";
-                break;
-            case GL_INVALID_OPERATION:
-                error = "INVALID_OPERATION";
-                break;
-            case GL_STACK_OVERFLOW:
-                error = "STACK_OVERFLOW";
-                break;
-            case GL_STACK_UNDERFLOW:
-                error = "STACK_UNDERFLOW";
-                break;
-            case GL_OUT_OF_MEMORY:
-                error = "OUT_OF_MEMORY";
-                break;
-            case GL_INVALID_FRAMEBUFFER_OPERATION:
-                error = "INVALID_FRAMEBUFFER_OPERATION";
-                break;
-            default:
-                error = "UNDEFINED_ERROR";
-                break;
-        }
-        std::cout << error << " | " << file << " (" << line << ")" << std::endl;
-    }
-    return errorCode;
-}
-
-#define glCheckError() glCheckError_(__FILE__, __LINE__)
-
 int main() {
-    //glfw initiation
-    glfwInit();
-    glfwSetErrorCallback(error_callback);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    GlUtil::init();
     //for debug
 //    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
@@ -135,7 +90,7 @@ int main() {
     //texture
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    glCheckError();
+    GlUtil::glCheckError();
 
     //init texture
     int imgWidth, imgHeight, nrChannels, imgWidth2, imgHeight2, nrChannels2; //nrChannels: number of color channels
@@ -173,7 +128,7 @@ int main() {
     //set as uniforms of fragment shader
     shader.setInt("sampler1", 0);
     shader.setInt("sampler2", 1);
-    glCheckError();
+    GlUtil::glCheckError();
 
     Fps fps = Fps();
     //render loop
@@ -203,7 +158,7 @@ int main() {
         glfwPollEvents();
         std::string content = fps.refresh();
         fps.show(&content);
-        glCheckError();
+        GlUtil::glCheckError();
     }
 
     glDeleteVertexArrays(1, &vertexArray);

@@ -5,7 +5,6 @@
 #ifndef NONAME_SHADER_HPP
 #define NONAME_SHADER_HPP
 
-#include <glad/glad.h>
 
 #include <string>
 #include <fstream>

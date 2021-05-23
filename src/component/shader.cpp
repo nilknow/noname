@@ -2,6 +2,7 @@
 // Created by pg on 2021/5/14.
 //
 
+#include <glad/glad.h>
 #include "shader.hpp"
 
 Shader::Shader(const char *vertexPath, const char *fragmentPath) {

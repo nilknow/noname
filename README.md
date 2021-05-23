@@ -28,6 +28,7 @@ this project prefix with `./build/`
 
 ## notes
 * ways to debug in opengl: console, `glGetError()` and some other GUI tools
+* using name space when all methods are all static would be better. 
 * cmake:
   -1. best practice:
     1.Since CMake version 3.13 use `cmake -B build` to avoid using `mkdir build; cd build; cmake ..`
