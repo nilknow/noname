@@ -4,14 +4,14 @@ project(noname)
 set(CMAKE_CXX_STANDARD 11)
 
 set(SOURCE
-        main.cpp
+        src/main.cpp
         ${CMAKE_SOURCE_DIR}/thirdparty/glad/glad.c
-        ${CMAKE_SOURCE_DIR}/shader/src/shader.cpp
-        ${CMAKE_SOURCE_DIR}/component/Fps.cpp
-        stb_image.cpp
+        ${CMAKE_SOURCE_DIR}/src/component/shader.cpp
+        ${CMAKE_SOURCE_DIR}/src/component/Fps.cpp
+        thirdparty/stb_image/stb_image.cpp
         )
 
-add_library(console SHARED ${CMAKE_SOURCE_DIR}/component/Console.cpp)
+add_library(console SHARED ${CMAKE_SOURCE_DIR}/src/component/Console.cpp)
 target_include_directories(console
         PUBLIC
         ${CMAKE_SOURCE_DIR}
@@ -49,6 +49,6 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
 
 # Config
 install(FILES
-        ${PROJECT_SOURCE_DIR}/shader/src/vertexShader.vs
-        ${PROJECT_SOURCE_DIR}/shader/src/fragmentShader.fs
+        src/resources/shader/vertexShader.vs
+        src/resources/shader/fragmentShader.fs
         DESTINATION etc)

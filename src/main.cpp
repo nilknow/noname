@@ -5,8 +5,8 @@
 #include <iostream>
 #include <valarray>
 
-#include "shader/src/shader.hpp"
-#include "stb_image.h"
+#include "src/component/shader.hpp"
+#include "thirdparty/stb_image/stb_image.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -97,8 +97,8 @@ int main() {
     }
 
     //shader setting
-    Shader shader = Shader("./shader/src/vertexShader.vs",
-                           "./shader/src/fragmentShader.fs");
+    Shader shader = Shader("./src/resources/shader/vertexShader.vs",
+                           "./src/resources/shader/fragmentShader.fs");
 
     //indexed drawing
     float vertices[] = {
@@ -140,8 +140,8 @@ int main() {
     //init texture
     int imgWidth, imgHeight, nrChannels, imgWidth2, imgHeight2, nrChannels2; //nrChannels: number of color channels
     stbi_set_flip_vertically_on_load(true);
-    unsigned char *imgData = stbi_load("./img/wooden_container.png", &imgWidth, &imgHeight, &nrChannels, 0);
-    unsigned char *imgData2 = stbi_load("./img/awesome_face.png", &imgWidth2, &imgHeight2, &nrChannels2, 0);
+    unsigned char *imgData = stbi_load("./src/resources/img/wooden_container.png", &imgWidth, &imgHeight, &nrChannels, 0);
+    unsigned char *imgData2 = stbi_load("./src/resources/img/awesome_face.png", &imgWidth2, &imgHeight2, &nrChannels2, 0);
     if (!imgData || !imgData2) {
         std::cout << "Failed to load texture" << std::endl;
         exit(1);
