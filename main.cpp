@@ -21,6 +21,8 @@ void keyInputCheck(GLFWwindow *pWindow);
 
 void render();
 
+void showBoundVertexArray();
+
 void error_callback(int error, const char *description) {
     fprintf(stderr, "Error: %s\n", description);
 }
@@ -118,6 +120,7 @@ int main() {
 
     //bind the vertex array object first, then set vertex buffer and config vertex attribute
     glBindVertexArray(vertexArray);
+    showBoundVertexArray();
 
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -210,6 +213,11 @@ int main() {
 
     glfwTerminate();
     return 0;
+}
+
+void showBoundVertexArray() {
+//    GLint* data = nullptr;
+//    glGetIntegerv(GL_VERTEX_ARRAY_BINDING, data);
 }
 
 void render() {

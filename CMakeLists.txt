@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(SOURCE
         main.cpp
-        ${CMAKE_SOURCE_DIR}/glad.c
+        ${CMAKE_SOURCE_DIR}/thirdparty/glad/glad.c
         ${CMAKE_SOURCE_DIR}/shader/src/shader.cpp
         ${CMAKE_SOURCE_DIR}/component/Fps.cpp
         stb_image.cpp
@@ -30,7 +30,7 @@ if(glfw3_FOUND)
     message ("glfw3 found")
 else()
     message (FATAL_ERROR "Cannot find glfw3")
-    add_subdirectory(${CMAKE_SOURCE_DIR}/glfw)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/glfw)
 endif()
 #add_subdirectory(${CMAKE_SOURCE_DIR}/glfw)
 target_link_libraries(noname GL pthread Xrandr Xi dl X11 glfw console)
