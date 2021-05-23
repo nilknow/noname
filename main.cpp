@@ -200,6 +200,7 @@ int main() {
         glfwPollEvents();
         std::string content = fps.refresh();
         fps.show(&content);
+        glCheckError();
     }
 
     glDeleteVertexArrays(1, &vertexArray);
