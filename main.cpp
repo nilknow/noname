@@ -15,8 +15,7 @@
 #define WIN_WIDTH 800
 #define WIN_HEIGHT 600
 
-void framebuffer_size_callback(GLFWwindow *pWindow, i
-nt width, int height);
+void framebuffer_size_callback(GLFWwindow *pWindow, int width, int height);
 
 void keyInputCheck(GLFWwindow *pWindow);
 
