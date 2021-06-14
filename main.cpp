@@ -5,17 +5,18 @@
 #include <iostream>
 #include <valarray>
 
-#include "shader/src/shader.hpp"
+#include "shader/include/shader.hpp"
 #include "stb_image.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "component/Fps.hpp"
+#include "Fps.hpp"
 
 #define WIN_WIDTH 800
 #define WIN_HEIGHT 600
 
-void framebuffer_size_callback(GLFWwindow *pWindow, int width, int height);
+void framebuffer_size_callback(GLFWwindow *pWindow, i
+nt width, int height);
 
 void keyInputCheck(GLFWwindow *pWindow);
 

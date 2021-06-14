@@ -7,23 +7,21 @@ set(SOURCE
         main.cpp
         ${CMAKE_SOURCE_DIR}/glad.c
         ${CMAKE_SOURCE_DIR}/shader/src/shader.cpp
-        ${CMAKE_SOURCE_DIR}/component/Fps.cpp
+        ${CMAKE_SOURCE_DIR}/component/src/Fps.cpp
+        ${CMAKE_SOURCE_DIR}/component/src/Console.cpp
         stb_image.cpp
         )
 
-add_library(console SHARED ${CMAKE_SOURCE_DIR}/component/Console.cpp)
-target_include_directories(console
-        PUBLIC
-        ${CMAKE_SOURCE_DIR}
-        ${CMAKE_SOURCE_DIR}/include
-        ${CMAKE_SOURCE_DIR}/shader/src
-        ${CMAKE_SOURCE_DIR}/component
-        )
-
 add_executable(${PROJECT_NAME} ${SOURCE})
-#target_sources(noname PRIVATE glad.c shader.cpp)
+
+include_directories(
+        ${CMAKE_SOURCE_DIR}/include
+        ${CMAKE_SOURCE_DIR}/shader/include
+        ${CMAKE_SOURCE_DIR}/component/include
+)
 
 link_directories(${CMAKE_SOURCE_DIR}/lib)
+
 find_package(glfw3 3.3 REQUIRED COMPONENTS filesystem system)
 # check if glfw3 was found
 if(glfw3_FOUND)
@@ -33,15 +31,10 @@ else()
     add_subdirectory(${CMAKE_SOURCE_DIR}/glfw)
 endif()
 #add_subdirectory(${CMAKE_SOURCE_DIR}/glfw)
-target_link_libraries(noname GL pthread Xrandr Xi dl X11 glfw console)
+target_link_libraries(noname GL pthread Xrandr Xi dl X11 glfw)
 
 # Binaries
 install(TARGETS noname DESTINATION bin)
-
-# Library
-# Note: may not work on windows
-install(TARGETS console
-        LIBRARY DESTINATION lib)
 
 # Header files
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
