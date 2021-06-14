@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.17)
 project(noname)
 
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Release)
 
 set(SOURCE
         main.cpp
@@ -13,6 +15,8 @@ set(SOURCE
         )
 
 add_executable(${PROJECT_NAME} ${SOURCE})
+#add_compile_options(-Wall -std=c++11 -O2)
+#set(CMAKE_C_FLAGS -g)
 
 include_directories(
         ${CMAKE_SOURCE_DIR}/include
