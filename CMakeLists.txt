@@ -6,12 +6,13 @@ set(CMAKE_BUILD_TYPE Debug)
 #set(CMAKE_BUILD_TYPE Release)
 
 set(SOURCE
-        main.cpp
-        ${CMAKE_SOURCE_DIR}/glad.c
-        ${CMAKE_SOURCE_DIR}/shader/src/shader.cpp
-        ${CMAKE_SOURCE_DIR}/component/src/Fps.cpp
-        ${CMAKE_SOURCE_DIR}/component/src/Console.cpp
-        stb_image.cpp
+        src/main.cpp
+        src/shader/src/shader.cpp
+        src/component/src/Fps.cpp
+        src/component/src/Console.cpp
+        # dependency
+        dep/glad/glad.c
+        dep/stb_image/stb_image.cpp
         )
 
 add_executable(${PROJECT_NAME} ${SOURCE})
@@ -19,9 +20,9 @@ add_executable(${PROJECT_NAME} ${SOURCE})
 #set(CMAKE_C_FLAGS -g)
 
 include_directories(
-        ${CMAKE_SOURCE_DIR}/include
-        ${CMAKE_SOURCE_DIR}/shader/include
-        ${CMAKE_SOURCE_DIR}/component/include
+        dep/stb_image
+        src/shader/include
+        src/component/include
 )
 
 link_directories(${CMAKE_SOURCE_DIR}/lib)
@@ -32,20 +33,7 @@ if(glfw3_FOUND)
     message ("glfw3 found")
 else()
     message (FATAL_ERROR "Cannot find glfw3")
-    add_subdirectory(${CMAKE_SOURCE_DIR}/glfw)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/dep/glfw)
 endif()
 #add_subdirectory(${CMAKE_SOURCE_DIR}/glfw)
 target_link_libraries(noname GL pthread Xrandr Xi dl X11 glfw)
-
-# Binaries
-install(TARGETS noname DESTINATION bin)
-
-# Header files
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
-        DESTINATION include)
-
-# Config
-install(FILES
-        ${PROJECT_SOURCE_DIR}/shader/src/vertexShader.vs
-        ${PROJECT_SOURCE_DIR}/shader/src/fragmentShader.fs
-        DESTINATION etc)
