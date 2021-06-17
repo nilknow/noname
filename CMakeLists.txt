@@ -20,6 +20,7 @@ add_executable(${PROJECT_NAME} ${SOURCE})
 #set(CMAKE_C_FLAGS -g)
 
 include_directories(
+        dep
         dep/stb_image
         src/shader/include
         src/component/include
