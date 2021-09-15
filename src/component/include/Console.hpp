@@ -6,6 +6,8 @@
 #define NONAME_CONSOLE_HPP
 
 #include <iostream>
+#include <string>
+
 
 class Console {
     std::string* _content;
