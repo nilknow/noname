@@ -2,8 +2,8 @@
 // Created by pg on 6/15/21.
 //
 
-#ifndef NONAME_WINDOW_H
-#define NONAME_WINDOW_H
+#ifndef NONAME_WINDOW_HPP
+#define NONAME_WINDOW_HPP
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -21,4 +21,4 @@ private:
     void operator=(Window const&);
 };
 
-#endif //NONAME_WINDOW_H
+#endif //NONAME_WINDOW_HPP

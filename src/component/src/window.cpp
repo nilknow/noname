@@ -2,7 +2,7 @@
 // Created by pg on 6/15/21.
 //
 
-#include "Window.h"
+#include "Window.hpp"
 
 
 const int WIN_WIDTH = 800;

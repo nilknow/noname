@@ -11,7 +11,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "Fps.hpp"
-#include "Window.h"
+#include "Window.hpp"
 
 #define WIN_WIDTH 800
 #define WIN_HEIGHT 600
