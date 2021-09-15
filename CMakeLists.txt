@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.17)
 project(noname)
 
 set(CMAKE_CXX_STANDARD 11)
+SET(CMAKE_CXX_COMPILER "clang++")
 set(CMAKE_BUILD_TYPE Debug)
 #set(CMAKE_BUILD_TYPE Release)
 
@@ -13,7 +14,7 @@ set(SOURCE
         # dependency
         dep/glad/glad.c
         dep/stb_image/stb_image.cpp
-        )
+        src/component/src/window.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCE})
 #add_compile_options(-Wall -std=c++11 -O2)
